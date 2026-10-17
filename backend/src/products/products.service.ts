@@ -4,14 +4,22 @@ import { Model } from 'mongoose';
 import { Product } from './product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 
+
+ 
+function escapeRegExp(text : string){
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+
+
 @Injectable()
 export class ProductsService {
   constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
 
   async findAll(search?: string, category?: string) {
     const filter: any = {};
-    if (search) {
-      filter.name = new RegExp(search, 'i');
+    if (search) { 
+      filter.name = new RegExp(escapeRegExp(search), 'i');
     }
 
     let products = await this.productModel.find(filter);
