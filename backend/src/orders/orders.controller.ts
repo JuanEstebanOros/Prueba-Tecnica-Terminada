@@ -11,16 +11,18 @@ export class OrdersController {
   findAll(@Query('status') status?: string) {
     return this.ordersService.findAll(status);
   }
+  
+  @Get('top-products')
+  topProducts(@Query('limit') limit = 10) {
+    return this.ordersService.topProducts(limit);
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ordersService.findOne(id);
   }
 
-  @Get('top-products')
-  topProducts(@Query('limit') limit = 10) {
-    return this.ordersService.topProducts(limit);
-  }
+
 
   @Post()
   create(@Body() dto: CreateOrderDto) {
