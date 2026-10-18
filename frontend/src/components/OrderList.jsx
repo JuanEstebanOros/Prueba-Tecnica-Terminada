@@ -10,7 +10,12 @@ export default function OrderList() {
       get(`/orders?status=${status}`).then((data) => setOrders(data));
     };
     load();
-    setInterval(load, 5000);
+    const ticket = setInterval(load, 5000);
+
+    return () =>{
+      clearInterval(ticket)
+    }
+
   }, [status]);
 
   return (
