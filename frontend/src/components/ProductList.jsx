@@ -26,14 +26,18 @@ export default function ProductList() {
   const [category, setCategory] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(0);
+const [page, setPage] = useState(1);
+const limit = 12;
 
   useEffect(() => {
-    setLoading(true);
-    get(`/products?search=${search}`).then((data) => {
-      setProducts(data);
-      setLoading(false);
-    });
-  }, [search]);
+  setLoading(true);
+  get(`/products?search=${search}&page=${page}&limit=${limit}`).then((data) => {
+    setProducts(data.data);
+    setTotal(data.total);
+    setLoading(false);
+  });
+}, [search, page]);
 
   const categories = [...new Set(products.map((p) => p.category))];
   const filtered = products.filter((p) => !category || p.category === category);
@@ -62,7 +66,7 @@ export default function ProductList() {
         {loading && <span>Cargando...</span>}
       </div>
 
-      <p className="muted">{sorted.length} productos</p>
+      <p className="muted">{total} productos</p>
 
       <div className="grid">
         {sorted.map((product, index) => (
@@ -74,6 +78,15 @@ export default function ProductList() {
           />
         ))}
       </div>
+      <div>
+  <button onClick={() => setPage(page - 1)} disabled={page === 1}>
+    Anterior
+  </button>
+  <span> Página {page} de {Math.ceil(total / limit)} </span>
+  <button onClick={() => setPage(page + 1)} disabled={page >= Math.ceil(total / limit)}>
+    Siguiente
+  </button>
+</div>
     </div>
   );
 }

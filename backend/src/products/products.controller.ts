@@ -4,11 +4,16 @@ import { CreateProductDto } from './dto/create-product.dto';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @Get()
-  findAll(@Query('search') search?: string, @Query('category') category?: string) {
-    return this.productsService.findAll(search, category);
+  findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('category') category?: string,
+  ) {
+    return this.productsService.findAll({ page, limit, search, category });
   }
 
   @Get('count')

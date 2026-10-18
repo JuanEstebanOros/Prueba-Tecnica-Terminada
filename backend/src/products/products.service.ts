@@ -16,27 +16,35 @@ function escapeRegExp(text : string){
 export class ProductsService {
   constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
 
-  async findAll(search?: string, category?: string) {
-    const filter: any = {};
-    if (search) { 
-      filter.name = new RegExp(escapeRegExp(search), 'i');
-    }
+  async findAll(params: { page?: string; limit?: string; search?: string; category?: string }) {
+  const page = Math.max(1, Number(params.page) || 1);
+  const limit = Math.min(100, Math.max(1, Number(params.limit) || 20));
 
-    let products = await this.productModel.find(filter);
-
-    if (category) {
-      products = products.filter((p) => p.category == category);
-    }
-
-    // Más nuevos primero
-    return products.sort((a: any, b: any) => b.createdAt - a.createdAt);
+  const filter: any = {};
+  if (params.search) {
+    filter.name = new RegExp(escapeRegExp(params.search), 'i');
+  }
+  if (params.category) {
+    filter.category = params.category;
   }
 
-  async count() {
-    const products = await this.productModel.find();
-    return { total: products.length };
-  }
+  const [data, total] = await Promise.all([
+    this.productModel
+      .find(filter)
+      .sort({ createdAt: -1, _id: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+    this.productModel.countDocuments(filter),
+  ]);
 
+  return { data, total, page, limit };
+}
+
+async count() {
+  const total = await this.productModel.countDocuments();
+  return { total };
+}
   async categories() {
     const products = await this.productModel.find();
     const categories = [];
