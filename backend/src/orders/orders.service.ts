@@ -45,19 +45,28 @@ export class OrdersService {
 
   async create(dto: CreateOrderDto) {
     let total = 0;
+   const productos = []
 
-    dto.items.forEach(async (item) => {
+
+     for(const item of dto.items){
       const product = await this.productModel.findById(item.productId);
 
       if (product.stock < item.quantity) {
         throw new BadRequestException(`No hay stock suficiente de ${product.name}`);
       }
 
+      productos.push({ product, item })
+
+    }
+
+    for(const { product, item } of productos ){
+
       product.stock = product.stock - item.quantity;
       await product.save();
 
       total += item.unitPrice * item.quantity;
-    });
+      } 
+   
 
     const order = await this.orderModel.create({
       customerId: dto.customerId,
