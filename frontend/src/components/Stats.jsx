@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { get } from '../api';
 
+const options = { limit: 10 };
+
 export default function Stats() {
   const [top, setTop] = useState([]);
   const [error, setError] = useState(null);
-  const options = { limit: 10 };
+  
 
   useEffect(() => {
     get(`/orders/top-products?limit=${options.limit}`)
