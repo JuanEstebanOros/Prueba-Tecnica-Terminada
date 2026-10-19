@@ -25,16 +25,20 @@ export default function Cart() {
       alert('Selecciona un cliente');
       return;
     }
-    const order = await post('/orders', {
-      customerId,
-      items: cart.map((item) => ({
-        productId: item._id,
-        quantity: item.quantity,
-        unitPrice: item.price,
-      })),
-    });
-    alert(`Pedido creado ✔ Total: $${order.total}`);
-    clearCart();
+    try {
+      const order = await post('/orders', {
+        customerId,
+        items: cart.map((item) => ({
+          productId: item._id,
+          quantity: item.quantity,
+          unitPrice: item.price,
+        })),
+      });
+      alert(`Pedido creado ✔ Total: $${order.total}`);
+      clearCart();
+    } catch (err) {
+      alert(`No se pudo crear el pedido: ${err.message}`);
+    }
   };
 
   return (
