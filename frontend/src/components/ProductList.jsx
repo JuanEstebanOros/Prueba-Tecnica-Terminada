@@ -28,31 +28,40 @@ export default function ProductList() {
   const [sortBy, setSortBy] = useState('name');
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
-const [page, setPage] = useState(1);
-const limit = 12;
+  const [searchInput, setSearchInput] = useState('');
+  const [page, setPage] = useState(1);
+  const limit = 12;
 
-useEffect(() => {
-  setLoading(true);
-  get(`/products?search=${search}&page=${page}&limit=${limit}&category=${category}`).then((data) => {
-    setProducts(data.data);
-    setTotal(data.total);
-    setLoading(false);
-  });
-}, [search, page, category]);
+  useEffect(() => {
+    setLoading(true);
+    get(`/products?search=${search}&page=${page}&limit=${limit}&category=${category}`).then((data) => {
+      setProducts(data.data);
+      setTotal(data.total);
+      setLoading(false);
+    });
+  }, [search, page, category]);
 
-useEffect(() => {
-  get('/products/categories').then((data) => setCategories(data));
-}, []);
+  useEffect(() => {
+    get('/products/categories').then((data) => setCategories(data));
+  }, []);
 
-const sorted = sortProducts(products, sortBy);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+
+  }, [searchInput]);
+  const sorted = sortProducts(products, sortBy);
 
   return (
     <div>
       <div className="toolbar">
         <input
           placeholder="Buscar producto..."
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
         />
         <select value={category} onChange={(e) => { setCategory(e.target.value); setPage(1); }}>
           <option value="">Todas las categorías</option>
@@ -82,14 +91,14 @@ const sorted = sortProducts(products, sortBy);
         ))}
       </div>
       <div>
-  <button onClick={() => setPage(page - 1)} disabled={page === 1}>
-    Anterior
-  </button>
-  <span> Página {page} de {Math.ceil(total / limit)} </span>
-  <button onClick={() => setPage(page + 1)} disabled={page >= Math.ceil(total / limit)}>
-    Siguiente
-  </button>
-</div>
+        <button onClick={() => setPage(page - 1)} disabled={page === 1}>
+          Anterior
+        </button>
+        <span> Página {page} de {Math.ceil(total / limit)} </span>
+        <button onClick={() => setPage(page + 1)} disabled={page >= Math.ceil(total / limit)}>
+          Siguiente
+        </button>
+      </div>
     </div>
   );
 }
