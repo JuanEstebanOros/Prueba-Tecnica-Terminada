@@ -25,9 +25,14 @@ const addToCart = (product) => {
   };
 
   const updateQuantity = (productId, quantity) => {
-    if (!(quantity >= 1)) return;
+    if (Number.isNaN(quantity)) return;
+    // Limita entre 1 y el stock por comodidad; la validación real es la del backend.
     setCart((prev) =>
-      prev.map((item) => (item._id === productId ? { ...item, quantity } : item))
+      prev.map((item) =>
+        item._id === productId
+          ? { ...item, quantity: Math.min(Math.max(1, quantity), item.stock) }
+          : item
+      )
     );
   };
 
