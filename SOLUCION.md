@@ -93,7 +93,7 @@
 | Sin manejo de error en `ProductList`/`OrderList`: si la API falla, "Cargando..." se queda para siempre | `ProductList.jsx`, `OrderList.jsx` | Bajo | Sí, `.catch` guarda el mensaje en un estado `error`, se muestra en pantalla, se quita el "Cargando..." y se limpia en la siguiente carga exitosa |
 | El estado `error` de Stats nunca se limpia | `Stats.jsx` | Bajo | No |
 | `removeFromCart` usa el `cart` viejo (el mismo problema de T1) | `CartContext.jsx` | Bajo | No |
-| El input de cantidad del carrito usa `defaultValue` y no está conectado: cambiarlo no hace nada | `Cart.jsx` | Bajo: confunde al usuario | Sí, `updateQuantity` en `CartContext` (actualizador funcional, ignora cantidades < 1) e input controlado con `value` + `onChange` |
+| El input de cantidad del carrito usa `defaultValue` y no está conectado: cambiarlo no hace nada | `Cart.jsx` | Bajo: confunde al usuario | Sí, `updateQuantity` en `CartContext` (actualizador funcional, limita la cantidad entre 1 y el stock con `Math.min(Math.max(1, quantity), item.stock)`) e input controlado con `value` + `onChange` + `max={item.stock}`. Este límite del frontend es solo por comodidad: la validación real del stock sigue siendo la del backend (T3), porque el stock del carrito es el que había al agregarlo y alguien puede saltarse el frontend |
 | El carrito usa `key={index}` | `Cart.jsx` | Bajo | Sí, `key={item._id}` |
 | Totales con decimales flotantes sin redondear | `Cart.jsx`, `orders.service.ts` | Bajo: montos tipo `$30.060000000000002` | Parcial: el carrito los muestra con `.toFixed(2)`; el total guardado en el backend sigue sin redondear |
 
