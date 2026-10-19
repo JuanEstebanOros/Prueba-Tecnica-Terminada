@@ -38,6 +38,24 @@ npm install
 npm run dev
 ```
 
+### Variables de entorno (opcional)
+
+| Variable    | Por defecto                         | Uso                                         |
+|-------------|-------------------------------------|---------------------------------------------|
+| `MONGO_URI` | `mongodb://localhost:27017/tienda`  | Conexión a MongoDB del backend y del `seed` |
+
+Si no la defines, se usa el valor por defecto y los pasos de arriba funcionan igual. Para usar otra base:
+
+```bash
+# bash
+MONGO_URI=mongodb://otro-host:27017/tienda npm run start:dev
+```
+
+```powershell
+# PowerShell
+$env:MONGO_URI = "mongodb://otro-host:27017/tienda"; npm run start:dev
+```
+
 ### Estructura
 
 ```
