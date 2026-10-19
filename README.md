@@ -77,7 +77,7 @@ $env:MONGO_URI = "mongodb://otro-host:27017/tienda"; npm run start:dev
 
 | Método | Ruta                        | Descripción                          |
 |--------|-----------------------------|--------------------------------------|
-| GET    | `/products`                 | Lista de productos (`search`, `category`) |
+| GET    | `/products`                 | Lista paginada de productos (`page`, `limit` máx. 100, `search`, `category`, `sortBy`: `name`/`price`). Responde `{ data, total, page, limit }` |
 | GET    | `/products/count`           | Total de productos                   |
 | GET    | `/products/categories`      | Categorías disponibles               |
 | GET    | `/products/:id`             | Detalle de un producto               |

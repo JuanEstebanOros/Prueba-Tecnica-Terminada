@@ -79,18 +79,18 @@
 | `api.js` no revisaba `res.ok`: un 400/500 se trataba como éxito ("Total: $undefined") | `frontend/src/api.js`, `Cart.jsx` | Medio: el usuario cree que compró cuando falló | Sí, lanza `Error` con el mensaje del backend y el carrito lo muestra |
 | `main.ts` sin `ValidationPipe`: los DTOs con class-validator no se aplican (se acepta un pedido con `items: []` o un cliente que no existe) | `backend/src/main.ts` | Alto: entran datos inválidos a la BD | No |
 | CORS abierto a cualquier origen | `main.ts` (`enableCors()`) | Medio | No |
-| URI de Mongo hardcodeada | `app.module.ts`, `seed.ts` | Bajo/Medio: no se puede configurar por entorno | No |
+| URI de Mongo hardcodeada | `app.module.ts`, `seed.ts` | Bajo/Medio: no se puede configurar por entorno | Sí, se lee de `MONGO_URI` (con el valor local como respaldo) y está documentada en el README |
 | La API de clientes devuelve la contraseña en texto plano (y se guarda sin hash) | `customers.service.ts`, `customer.schema.ts` | Alto: fuga de credenciales | No |
-| Se confía en el `unitPrice` que manda el cliente | `orders.service.ts` `create` | Alto: alguien puede comprar a $0.01 | No (debería usar `product.price` de la BD) |
+| Se confía en el `unitPrice` que manda el cliente | `orders.service.ts` `create` | Alto: alguien puede comprar a $0.01 | Sí, el total y el `unitPrice` guardado salen de `product.price` de la BD |
 | Condición de carrera en el stock: leer → validar → guardar no es atómico | `orders.service.ts` `create` | Medio: dos compras simultáneas pueden dejar stock negativo | No (alternativa: `findOneAndUpdate` con `stock: { $gte: qty }` + `$inc`, o una transacción) |
-| `create` falla con 500 si el `productId` no existe (`product` es `null`) | `orders.service.ts` | Medio | No |
-| `updateStatus` falla con 500 si la orden no existe (`order` es `null`) | `orders.service.ts` | Medio: debería ser 404 | No |
+| `create` falla con 500 si el `productId` no existe (`product` es `null`) | `orders.service.ts` | Medio | Sí, `NotFoundException` (404) con mensaje claro |
+| `updateStatus` falla con 500 si la orden no existe (`order` es `null`) | `orders.service.ts` | Medio: debería ser 404 | Sí, `NotFoundException` (404) |
 | `topProducts` carga **todas** las órdenes en memoria, hace un `findById` por producto y falla si el producto es `null` | `orders.service.ts` | Medio: lento y frágil | No (mejor un `aggregate` con `$unwind`/`$group`/`$lookup`) |
 | `findOne` con un id mal formado da `CastError` (500) en vez de 400/404 | products, orders, customers | Bajo | No |
 | Falta índice en `category` y `createdAt` (y `name` para ordenar) | `product.schema.ts`, `order.schema.ts` | Medio: las consultas escanean toda la colección | No |
 | Los parámetros de la URL no se codifican: buscar `a&b` o `#` corta la query | `ProductList.jsx` | Bajo | No (usar `encodeURIComponent` o `URLSearchParams`) |
 | Peticiones obsoletas pueden pisar a las nuevas (respuesta lenta de una búsqueda vieja) | `ProductList.jsx`, `OrderList.jsx` | Bajo | No (usar `AbortController`) |
-| Sin manejo de error en `ProductList`/`OrderList`: si la API falla, "Cargando..." se queda para siempre | `ProductList.jsx`, `OrderList.jsx` | Bajo | No |
+| Sin manejo de error en `ProductList`/`OrderList`: si la API falla, "Cargando..." se queda para siempre | `ProductList.jsx`, `OrderList.jsx` | Bajo | Sí, `.catch` guarda el mensaje en un estado `error`, se muestra en pantalla, se quita el "Cargando..." y se limpia en la siguiente carga exitosa |
 | El estado `error` de Stats nunca se limpia | `Stats.jsx` | Bajo | No |
 | `removeFromCart` usa el `cart` viejo (el mismo problema de T1) | `CartContext.jsx` | Bajo | No |
 | El input de cantidad del carrito usa `defaultValue` y no está conectado: cambiarlo no hace nada | `Cart.jsx` | Bajo: confunde al usuario | No |
@@ -99,9 +99,9 @@
 
 ## Si tuviera más tiempo…
 
-1. **Seguridad primero:** usar `product.price` de la BD en vez del `unitPrice` del cliente, activar `ValidationPipe` con DTOs de class-validator, y quitar la contraseña de las respuestas (y guardarla con hash).
-2. **Integridad del pedido:** descuento de stock atómico (`findOneAndUpdate` con `$gte` + `$inc`) o una transacción de Mongo para todo el pedido. Responder 404 cuando no existe el producto o la orden.
+1. **Seguridad primero:** activar `ValidationPipe` con DTOs de class-validator (y quitar `unitPrice` del DTO, que ya no se usa), y quitar la contraseña de las respuestas (y guardarla con hash).
+2. **Integridad del pedido:** descuento de stock atómico (`findOneAndUpdate` con `$gte` + `$inc`) o una transacción de Mongo para todo el pedido.
 3. **Tests:** unitarios y e2e de la creación de órdenes (total, stock insuficiente → 400, sin descuento parcial) y de la paginación.
 4. **Rendimiento:** índices en Mongo (`category`, `createdAt`, `name`), `topProducts` con `aggregate`, y caché de categorías.
-5. **Frontend:** estados de error/loading/vacío en la UI, `AbortController` para peticiones obsoletas y `URLSearchParams` para las queries.
-6. **Configuración:** variables de entorno para la URI de Mongo, el puerto, la URL de la API y los orígenes de CORS.
+5. **Frontend:** estado vacío en la UI, `AbortController` para peticiones obsoletas y `URLSearchParams` para las queries.
+6. **Configuración:** variables de entorno para el puerto, la URL de la API y los orígenes de CORS (la URI de Mongo ya usa `MONGO_URI`).
