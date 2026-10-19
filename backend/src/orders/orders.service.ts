@@ -73,13 +73,18 @@ async findAll(status?: string) {
       product.stock = product.stock - item.quantity;
       await product.save();
 
-      total += item.unitPrice * item.quantity;
-      } 
-   
+      // El precio sale de la BD, no del unitPrice que manda el cliente.
+      total += product.price * item.quantity;
+      }
+
 
     const order = await this.orderModel.create({
       customerId: dto.customerId,
-      items: dto.items,
+      items: productos.map(({ product, item }) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: product.price,
+      })),
       total: total,
       status: 'pending',
     });
