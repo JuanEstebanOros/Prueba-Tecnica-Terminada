@@ -13,6 +13,7 @@ export default function ProductList() {
   const [category, setCategory] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [total, setTotal] = useState(0);
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
@@ -23,6 +24,10 @@ export default function ProductList() {
     get(`/products?search=${search}&page=${page}&limit=${limit}&category=${category}&sortBy=${sortBy}`).then((data) => {
       setProducts(data.data);
       setTotal(data.total);
+      setError(null);
+      setLoading(false);
+    }).catch((err) => {
+      setError(err.message);
       setLoading(false);
     });
 }, [search, page, category, sortBy]);
@@ -63,6 +68,8 @@ export default function ProductList() {
         </select>
         {loading && <span>Cargando...</span>}
       </div>
+
+      {error && <p className="error">Error cargando productos: {error}</p>}
 
       <p className="muted">{total} productos</p>
 

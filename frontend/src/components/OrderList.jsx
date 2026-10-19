@@ -4,10 +4,16 @@ import { get } from '../api';
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [status, setStatus] = useState('');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const load = () => {
-      get(`/orders?status=${status}`).then((data) => setOrders(data));
+      get(`/orders?status=${status}`)
+        .then((data) => {
+          setOrders(data);
+          setError(null);
+        })
+        .catch((err) => setError(err.message));
     };
     load();
     const ticket = setInterval(load, 5000);
@@ -29,6 +35,8 @@ export default function OrderList() {
           <option value="cancelled">Cancelados</option>
         </select>
       </div>
+
+      {error && <p className="error">Error cargando pedidos: {error}</p>}
 
       <p className="muted">{orders.length} pedidos</p>
 
