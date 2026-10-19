@@ -49,7 +49,7 @@ export default function ProductList() {
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />
-        <select value={category} onChange={(e) => { setCategory(e.target.value); setPage(1); }}>
+        <select value={category} autoComplete="off" onChange={(e) => { setCategory(e.target.value); setPage(1); }}>
           <option value="">Todas las categorías</option>
           {categories.map((c) => (
             <option key={c} value={c}>
@@ -57,7 +57,7 @@ export default function ProductList() {
             </option>
           ))}
         </select>
-        <select value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(1); }}>
+        <select value={sortBy} autoComplete="off" onChange={(e) => { setSortBy(e.target.value); setPage(1); }}>
           <option value="name">Nombre</option>
           <option value="price">Precio</option>
         </select>
