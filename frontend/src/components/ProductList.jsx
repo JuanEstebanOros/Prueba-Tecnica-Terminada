@@ -21,6 +21,7 @@ function sortProducts(products, sortBy) {
 
 export default function ProductList() {
   const { addToCart } = useCart();
+  const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -30,18 +31,20 @@ export default function ProductList() {
 const [page, setPage] = useState(1);
 const limit = 12;
 
-  useEffect(() => {
+useEffect(() => {
   setLoading(true);
-  get(`/products?search=${search}&page=${page}&limit=${limit}`).then((data) => {
+  get(`/products?search=${search}&page=${page}&limit=${limit}&category=${category}`).then((data) => {
     setProducts(data.data);
     setTotal(data.total);
     setLoading(false);
   });
-}, [search, page]);
+}, [search, page, category]);
 
-  const categories = [...new Set(products.map((p) => p.category))];
-  const filtered = products.filter((p) => !category || p.category === category);
-  const sorted = sortProducts(filtered, sortBy);
+useEffect(() => {
+  get('/products/categories').then((data) => setCategories(data));
+}, []);
+
+const sorted = sortProducts(products, sortBy);
 
   return (
     <div>
@@ -49,9 +52,9 @@ const limit = 12;
         <input
           placeholder="Buscar producto..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
         />
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+        <select value={category} onChange={(e) => { setCategory(e.target.value); setPage(1); }}>
           <option value="">Todas las categorías</option>
           {categories.map((c) => (
             <option key={c} value={c}>

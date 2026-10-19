@@ -45,17 +45,9 @@ async count() {
   const total = await this.productModel.countDocuments();
   return { total };
 }
-  async categories() {
-    const products = await this.productModel.find();
-    const categories = [];
-    for (const p of products) {
-      if (!categories.includes(p.category)) {
-        categories.push(p.category);
-      }
-    }
-    return categories;
-  }
-
+ async categories() {
+  return this.productModel.distinct('category');
+}
   async findOne(id: string) {
     return this.productModel.findById(id);
   }
