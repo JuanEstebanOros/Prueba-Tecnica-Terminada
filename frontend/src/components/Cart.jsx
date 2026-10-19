@@ -61,13 +61,13 @@ export default function Cart() {
           <li key={index}>
             <span>{item.name}</span>
             <input type="number" min="1" defaultValue={item.quantity} />
-            <span>${item.price * item.quantity}</span>
+            <span>${(item.price * item.quantity).toFixed(2)}</span>
             <button onClick={() => removeFromCart(item._id)}>✕</button>
           </li>
         ))}
       </ul>
 
-      <p className="total">Total: ${total}</p>
+      <p className="total">Total: ${total.toFixed(2)}</p>
       <button className="primary" onClick={checkout} disabled={cart.length === 0}>
         Finalizar compra
       </button>
