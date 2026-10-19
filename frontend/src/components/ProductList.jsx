@@ -3,21 +3,7 @@ import { get } from '../api';
 import { useCart } from '../context/CartContext';
 import ProductCard from './ProductCard';
 
-function sortProducts(products, sortBy) {
-  const copy = [...products];
-  for (let i = 0; i < copy.length; i++) {
-    for (let j = 0; j < copy.length - i - 1; j++) {
-      const a = sortBy === 'price' ? copy[j].price : copy[j].name;
-      const b = sortBy === 'price' ? copy[j + 1].price : copy[j + 1].name;
-      if (a > b) {
-        const tmp = copy[j];
-        copy[j] = copy[j + 1];
-        copy[j + 1] = tmp;
-      }
-    }
-  }
-  return copy;
-}
+
 
 export default function ProductList() {
   const { addToCart } = useCart();
@@ -34,12 +20,12 @@ export default function ProductList() {
 
   useEffect(() => {
     setLoading(true);
-    get(`/products?search=${search}&page=${page}&limit=${limit}&category=${category}`).then((data) => {
+    get(`/products?search=${search}&page=${page}&limit=${limit}&category=${category}&sortBy=${sortBy}`).then((data) => {
       setProducts(data.data);
       setTotal(data.total);
       setLoading(false);
     });
-  }, [search, page, category]);
+}, [search, page, category]);
 
   useEffect(() => {
     get('/products/categories').then((data) => setCategories(data));
@@ -53,7 +39,7 @@ export default function ProductList() {
     return () => clearTimeout(timer);
 
   }, [searchInput]);
-  const sorted = sortProducts(products, sortBy);
+
 
   return (
     <div>
@@ -81,7 +67,7 @@ export default function ProductList() {
       <p className="muted">{total} productos</p>
 
       <div className="grid">
-        {sorted.map((product, index) => (
+        {products.map((product, index) => (
           <ProductCard
             key={index}
             product={product}
