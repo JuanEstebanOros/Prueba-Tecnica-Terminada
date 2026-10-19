@@ -67,9 +67,9 @@ export default function ProductList() {
       <p className="muted">{total} productos</p>
 
       <div className="grid">
-        {products.map((product, index) => (
+        {products.map((product) => (
           <ProductCard
-            key={index}
+            key={product._id}
             product={product}
             onAdd={() => addToCart(product)}
             style={{ borderColor: product.stock < 5 ? 'orange' : '#ddd' }}
