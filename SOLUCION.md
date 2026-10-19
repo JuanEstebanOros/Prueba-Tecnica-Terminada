@@ -93,9 +93,9 @@
 | Sin manejo de error en `ProductList`/`OrderList`: si la API falla, "Cargando..." se queda para siempre | `ProductList.jsx`, `OrderList.jsx` | Bajo | Sí, `.catch` guarda el mensaje en un estado `error`, se muestra en pantalla, se quita el "Cargando..." y se limpia en la siguiente carga exitosa |
 | El estado `error` de Stats nunca se limpia | `Stats.jsx` | Bajo | No |
 | `removeFromCart` usa el `cart` viejo (el mismo problema de T1) | `CartContext.jsx` | Bajo | No |
-| El input de cantidad del carrito usa `defaultValue` y no está conectado: cambiarlo no hace nada | `Cart.jsx` | Bajo: confunde al usuario | No |
-| El carrito usa `key={index}` | `Cart.jsx` | Bajo | No |
-| Totales con decimales flotantes sin redondear | `Cart.jsx`, `orders.service.ts` | Bajo: montos tipo `$12.300000001` | No |
+| El input de cantidad del carrito usa `defaultValue` y no está conectado: cambiarlo no hace nada | `Cart.jsx` | Bajo: confunde al usuario | Sí, `updateQuantity` en `CartContext` (actualizador funcional, ignora cantidades < 1) e input controlado con `value` + `onChange` |
+| El carrito usa `key={index}` | `Cart.jsx` | Bajo | Sí, `key={item._id}` |
+| Totales con decimales flotantes sin redondear | `Cart.jsx`, `orders.service.ts` | Bajo: montos tipo `$30.060000000000002` | Parcial: el carrito los muestra con `.toFixed(2)`; el total guardado en el backend sigue sin redondear |
 
 ## Si tuviera más tiempo…
 
