@@ -10,6 +10,8 @@ const addToCart = (product) => {
     const existing = prev.find((item) => item._id === product._id);
 
     if (existing) {
+      // Ya llegó al stock: no se incrementa (la validación real es la del backend).
+      if (existing.quantity >= existing.stock) return prev;
       return prev.map((item) =>
        item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
       );
