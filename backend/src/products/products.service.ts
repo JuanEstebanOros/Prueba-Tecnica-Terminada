@@ -16,7 +16,7 @@ function escapeRegExp(text : string){
 export class ProductsService {
   constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
 
-  async findAll(params: { page?: string; limit?: string; search?: string; category?: string }) {
+  async findAll(params: { page?: string; limit?: string; search?: string; category?: string, sortBy?: string }) {
   const page = Math.max(1, Number(params.page) || 1);
   const limit = Math.min(100, Math.max(1, Number(params.limit) || 20));
 
@@ -28,10 +28,17 @@ export class ProductsService {
     filter.category = params.category;
   }
 
+  const sortOptions: any = {
+    name: { name: 1, _id: 1 },
+    price: { price: 1, _id: 1 },
+  };
+
+  const sort = sortOptions[params.sortBy] || { createdAt: -1, _id: -1 };
+
   const [data, total] = await Promise.all([
     this.productModel
       .find(filter)
-      .sort({ createdAt: -1, _id: -1 })
+      .sort(sort)
       .skip((page - 1) * limit)
       .limit(limit)
       .lean(),
@@ -40,6 +47,8 @@ export class ProductsService {
 
   return { data, total, page, limit };
 }
+
+
 
 async count() {
   const total = await this.productModel.countDocuments();
