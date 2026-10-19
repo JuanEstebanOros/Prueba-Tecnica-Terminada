@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Order } from './order.schema';
@@ -60,6 +60,10 @@ async findAll(status?: string) {
      for(const item of dto.items){
       const product = await this.productModel.findById(item.productId);
 
+      if (!product) {
+        throw new NotFoundException(`El producto ${item.productId} no existe`);
+      }
+
       if (product.stock < item.quantity) {
         throw new BadRequestException(`No hay stock suficiente de ${product.name}`);
       }
@@ -94,6 +98,9 @@ async findAll(status?: string) {
 
   async updateStatus(id: string, status: string) {
     const order = await this.orderModel.findById(id);
+    if (!order) {
+      throw new NotFoundException(`La orden ${id} no existe`);
+    }
     order.status = status;
     await order.save();
     return order;
