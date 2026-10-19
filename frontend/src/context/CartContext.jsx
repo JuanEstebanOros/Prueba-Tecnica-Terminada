@@ -24,10 +24,17 @@ const addToCart = (product) => {
     setCart(cart.filter((item) => item._id !== productId));
   };
 
+  const updateQuantity = (productId, quantity) => {
+    if (!(quantity >= 1)) return;
+    setCart((prev) =>
+      prev.map((item) => (item._id === productId ? { ...item, quantity } : item))
+    );
+  };
+
   const clearCart = () => setCart([]);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart }}>
       {children}
     </CartContext.Provider>
   );

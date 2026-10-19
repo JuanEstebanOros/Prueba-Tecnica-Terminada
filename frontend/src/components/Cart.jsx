@@ -3,7 +3,7 @@ import { get, post } from '../api';
 import { useCart } from '../context/CartContext';
 
 export default function Cart() {
-  const { cart, removeFromCart, clearCart } = useCart();
+  const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
   const [customers, setCustomers] = useState([]);
   const [customerId, setCustomerId] = useState('');
   const [total, setTotal] = useState(0);
@@ -57,10 +57,15 @@ export default function Cart() {
       {cart.length === 0 && <p className="muted">El carrito está vacío</p>}
 
       <ul>
-        {cart.map((item, index) => (
-          <li key={index}>
+        {cart.map((item) => (
+          <li key={item._id}>
             <span>{item.name}</span>
-            <input type="number" min="1" defaultValue={item.quantity} />
+            <input
+              type="number"
+              min="1"
+              value={item.quantity}
+              onChange={(e) => updateQuantity(item._id, Number(e.target.value))}
+            />
             <span>${(item.price * item.quantity).toFixed(2)}</span>
             <button onClick={() => removeFromCart(item._id)}>✕</button>
           </li>
