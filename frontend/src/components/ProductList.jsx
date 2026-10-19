@@ -25,7 +25,7 @@ export default function ProductList() {
       setTotal(data.total);
       setLoading(false);
     });
-}, [search, page, category]);
+}, [search, page, category, sortBy]);
 
   useEffect(() => {
     get('/products/categories').then((data) => setCategories(data));
@@ -57,7 +57,7 @@ export default function ProductList() {
             </option>
           ))}
         </select>
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+        <select value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(1); }}>
           <option value="name">Nombre</option>
           <option value="price">Precio</option>
         </select>
